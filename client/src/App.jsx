@@ -1,44 +1,18 @@
-import React, { useState, useEffect } from "react";
-import socketIOClient from "socket.io-client";
-import "./App.css";
+import React from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-const ENDPOINT = "http://127.0.0.1:4000";
+import "./App.css";
+import Home from "./Home/Home";
+import ChatRoom from "./ChatRoom/ChatRoom";
 
 function App() {
-  const [message, setMessage] = useState("");
-  const [socket, setSocket] = useState();
-  const [messages, setMessages] = useState([]);
-
-  useEffect(() => {
-    const sock = socketIOClient(ENDPOINT);
-    setSocket(sock);
-    sock.on("ClientId", (guid) => {
-      console.log(guid);
-    });
-    sock.on("ChatMessage", (msg) => {
-      setMessages((messages) => [...messages, msg]);
-    });
-  }, []);
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    socket.emit("ChatMessage", message);
-    setMessage("");
-  };
-
   return (
-    <div className="App">
-      <ul id="messages"></ul>
-      <form onSubmit={handleSubmit}>
-        <input
-          id="message"
-          autoComplete="off"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <input type="submit" value="Send" />
-      </form>
-    </div>
+    <Router>
+      <Switch>
+        <Route exact path="/" component={Home} />
+        <Route exact path="/:roomId" component={ChatRoom} />
+      </Switch>
+    </Router>
   );
 }
 

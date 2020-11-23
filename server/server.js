@@ -1,16 +1,17 @@
 const express = require("express");
-const http = require("http");
+const app = express();
+const http = require('http').createServer(app)
 const socketIo = require("socket.io");
 const router = express.Router();
-const app = express();
-const server = http.createServer(app);
+
 const guid = require("./guid");
 
 // Hashmaps
 const clients = {};
 
+
 // Create Socket.io with CORS
-const io = require("socket.io")(server, {
+const io = require("socket.io")(http, {
   cors: {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"],
@@ -26,20 +27,22 @@ const io = require("socket.io")(server, {
 
 io.on("connection", (socket) => {
   const id = guid();
-  clients[id] = {
-    socket,
-  };
   console.log("New client connected: " + id);
   socket.emit("ClientId", id);
 
   socket.on("disconnect", () => {
+    socket.leave(roomId);
     console.log("Client disconnected");
   });
 
-  socket.on("ChatMessage", (msg) => {
-    console.log("message: " + msg);
-    io.emit("ChatMessage", msg); // This will emit the event to all connected sockets
+  // Join a conversation
+  const { roomId } = socket.handshake.query;
+  socket.join(roomId);
+
+  // Listen for new messages
+  socket.on(NEW_CHAT_MESSAGE_EVENT, (data) => {
+    io.in(roomId).emit("newChatMessage", data);
   });
 });
 
-server.listen(4000, () => console.log(`Listening on port 4000`));
+http.listen(4000, () => console.log(`Listening on port 4000`));

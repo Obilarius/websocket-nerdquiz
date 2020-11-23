@@ -1,0 +1,21 @@
+.homeContainer {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.joinRoomWrapper input.text-input-field {
+  font-size: 20px;
+  padding: 10px;
+}
+
+.enter-room-button button {
+  font-size: 20px;
+  padding: 10px;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.enter-room-button button:hover {
+  color: rgba(0, 0, 0, 0.6);
+}
